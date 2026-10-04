@@ -1,0 +1,253 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+}
+
+html {
+  background: #000;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  color: #fafafa;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background:
+    radial-gradient(90% 42% at 50% -8%, rgba(245, 158, 11, 0.18), transparent 58%),
+    radial-gradient(46% 30% at 100% 100%, rgba(120, 53, 15, 0.3), transparent 55%),
+    #000;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(251, 191, 36, 0.35);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(251, 191, 36, 0.85);
+  outline-offset: 2px;
+}
+
+.streak-glow {
+  text-shadow:
+    0 0 22px rgba(251, 191, 36, 0.38),
+    0 0 2px rgba(251, 191, 36, 0.5);
+}
+
+.nav-icon {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid #27272a;
+  background: rgba(24, 24, 27, 0.8);
+  color: #e4e4e7;
+  transition: transform 150ms ease;
+}
+
+.nav-icon:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.chain-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  column-gap: 6px;
+  row-gap: 8px;
+}
+
+.chain-bridge {
+  position: absolute;
+  top: 50%;
+  left: 46%;
+  right: -10px;
+  z-index: 0;
+  height: 3px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: #fbbf24;
+  box-shadow:
+    0 0 8px rgba(251, 191, 36, 0.95),
+    0 0 16px rgba(245, 158, 11, 0.4);
+  pointer-events: none;
+}
+
+.cell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  aspect-ratio: 1;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border-radius: 11px;
+  border: 1px solid #27272a;
+  background: rgba(24, 24, 27, 0.82);
+  color: #71717a;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cell-compact {
+  border-radius: 8px;
+}
+
+.cell-sample {
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: none;
+}
+
+.cell-cross {
+  border-color: rgba(251, 191, 36, 0.55);
+  color: #fcd34d;
+  background: radial-gradient(circle at 50% 42%, rgba(251, 191, 36, 0.38), rgba(245, 158, 11, 0.07) 58%, rgba(0, 0, 0, 0.2) 80%);
+}
+
+.cell-slash {
+  border-color: rgba(245, 158, 11, 0.38);
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.cell-future {
+  pointer-events: none;
+  border-color: #18181b;
+  background: rgba(9, 9, 11, 0.4);
+  color: #3f3f46;
+  opacity: 0.42;
+}
+
+.cell-locked {
+  pointer-events: none;
+  opacity: 0.36;
+}
+
+.cell-locked.cell-cross,
+.cell-locked.cell-slash {
+  opacity: 0.58;
+}
+
+.cell-sealed-future {
+  pointer-events: none;
+}
+
+.cell-today {
+  animation: ring-pulse 2.4s ease-in-out infinite;
+}
+
+.cell-pressable {
+  cursor: pointer;
+  transition: transform 150ms ease;
+}
+
+.cell-pressable:active {
+  transform: scale(0.95);
+}
+
+.mark-glow {
+  position: relative;
+  z-index: 1;
+  filter:
+    drop-shadow(0 0 3px rgba(251, 191, 36, 0.95))
+    drop-shadow(0 0 8px rgba(245, 158, 11, 0.55));
+}
+
+@keyframes ring-pulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px rgba(251, 191, 36, 0.2),
+      0 0 0 0 rgba(251, 191, 36, 0.45);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 1px rgba(251, 191, 36, 0.85),
+      0 0 0 5px rgba(251, 191, 36, 0);
+  }
+}
+
+@keyframes stamp {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  58% {
+    transform: scale(1.16);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.mark-stamp {
+  animation: stamp 240ms cubic-bezier(0.2, 0.85, 0.2, 1);
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.sheet-in {
+  animation: sheet-in 280ms cubic-bezier(0.2, 0.85, 0.2, 1);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 180ms ease-out;
+}
+
+button.cell:disabled {
+  color: inherit;
+}
+
+button.cell.cell-locked:disabled {
+  opacity: 0.36;
+}
+
+button.cell.cell-locked.cell-cross:disabled,
+button.cell.cell-locked.cell-slash:disabled {
+  opacity: 0.58;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell-today,
+  .mark-stamp,
+  .sheet-in,
+  .fade-in {
+    animation: none;
+  }
+}

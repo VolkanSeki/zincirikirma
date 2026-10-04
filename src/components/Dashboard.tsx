@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChainMark } from './ChainMark.tsx'
 import { HabitCard } from './HabitCard.tsx'
 import { NewHabitModal } from './NewHabitModal.tsx'
 import { Page } from './Page.tsx'
+import { resetAppleTouchIcon } from '../lib/appleTouchIcon.ts'
 import { useHabits } from '../context/useHabits.ts'
 import { usePageTitle } from '../hooks/usePageTitle.ts'
 import { useToday } from '../hooks/useToday.ts'
@@ -12,6 +13,10 @@ export function Dashboard() {
   const today = useToday()
   const [open, setOpen] = useState(false)
   usePageTitle('Zinciri Kırma')
+
+  useEffect(() => {
+    resetAppleTouchIcon()
+  }, [])
 
   const ordered = [...habits].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 

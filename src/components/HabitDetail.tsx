@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { weekProgress } from '../lib/dayState.ts'
 import { formatMonthTitle } from '../lib/dates.ts'
 import { habitTypeLabel } from '../lib/habits.ts'
+import { updateDynamicAppleTouchIcon, resetAppleTouchIcon } from '../lib/appleTouchIcon.ts'
 import { calculateStreak } from '../lib/streak.ts'
 import { cx } from '../lib/cx.ts'
 import { useHabits } from '../context/useHabits.ts'
@@ -50,6 +51,17 @@ function HabitView({
   const [confirming, setConfirming] = useState(false)
   const streak = calculateStreak(habit, today)
   const progress = habit.type === 'weekly' ? weekProgress(habit, today) : null
+
+  useEffect(() => {
+    updateDynamicAppleTouchIcon(habit.title, streak)
+  }, [habit.title, streak])
+
+  useEffect(() => {
+    return () => {
+      resetAppleTouchIcon()
+    }
+  }, [])
+
   const isCurrent = cursor.year === today.getFullYear() && cursor.month === today.getMonth()
 
   const shiftMonth = (amount: number) => {

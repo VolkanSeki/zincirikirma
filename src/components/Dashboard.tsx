@@ -4,6 +4,8 @@ import { HabitCard } from './HabitCard.tsx'
 import { NewHabitModal } from './NewHabitModal.tsx'
 import { Page } from './Page.tsx'
 import { resetAppleTouchIcon } from '../lib/appleTouchIcon.ts'
+import { setBadgeCount } from '../lib/badge.ts'
+import { calculateStreak } from '../lib/streak.ts'
 import { useHabits } from '../context/useHabits.ts'
 import { usePageTitle } from '../hooks/usePageTitle.ts'
 import { useToday } from '../hooks/useToday.ts'
@@ -17,6 +19,11 @@ export function Dashboard() {
   useEffect(() => {
     resetAppleTouchIcon()
   }, [])
+
+  useEffect(() => {
+    const highest = habits.reduce((max, habit) => Math.max(max, calculateStreak(habit, today)), 0)
+    setBadgeCount(highest)
+  }, [habits, today])
 
   const ordered = [...habits].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 

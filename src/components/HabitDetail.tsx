@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { weekProgress } from '../lib/dayState.ts'
+import { applyToggle, weekProgress } from '../lib/dayState.ts'
 import { formatMonthTitle } from '../lib/dates.ts'
 import { habitTypeLabel } from '../lib/habits.ts'
 import { updateDynamicAppleTouchIcon, resetAppleTouchIcon } from '../lib/appleTouchIcon.ts'
+import { setBadgeCount } from '../lib/badge.ts'
 import { calculateStreak } from '../lib/streak.ts'
 import { cx } from '../lib/cx.ts'
 import { useHabits } from '../context/useHabits.ts'
@@ -54,7 +55,13 @@ function HabitView({
 
   useEffect(() => {
     updateDynamicAppleTouchIcon(habit.title, streak)
+    setBadgeCount(streak)
   }, [habit.title, streak])
+
+  const handleToggle = (dateKey: string) => {
+    setBadgeCount(calculateStreak(applyToggle(habit, dateKey, today), today))
+    onToggle(dateKey)
+  }
 
   useEffect(() => {
     return () => {
@@ -137,7 +144,7 @@ function HabitView({
       </div>
 
       <div className="mt-4">
-        <Calendar habit={habit} today={today} year={cursor.year} month={cursor.month} onToggle={onToggle} />
+        <Calendar habit={habit} today={today} year={cursor.year} month={cursor.month} onToggle={handleToggle} />
       </div>
 
       <Legend habit={habit} />
@@ -210,6 +217,10 @@ function Legend({ habit }: { habit: Habit }) {
 }
 
 function MissingHabit() {
+  useEffect(() => {
+    setBadgeCount(0)
+  }, [])
+
   return (
     <Page>
       <Link

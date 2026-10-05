@@ -4,7 +4,6 @@ import { ChainMark } from './ChainMark.tsx'
 import { HabitCard } from './HabitCard.tsx'
 import { NewHabitModal } from './NewHabitModal.tsx'
 import { Page } from './Page.tsx'
-import { resetAppleTouchIcon } from '../lib/appleTouchIcon.ts'
 import { setBadgeCount } from '../lib/badge.ts'
 import { calculateStreak } from '../lib/streak.ts'
 import { useHabits } from '../context/useHabits.ts'
@@ -16,10 +15,6 @@ export function Dashboard() {
   const today = useToday()
   const [open, setOpen] = useState(false)
   usePageTitle('Zinciri Kırma')
-
-  useEffect(() => {
-    resetAppleTouchIcon()
-  }, [])
 
   const highest = habits.reduce((max, habit) => Math.max(max, calculateStreak(habit, today)), 0)
 

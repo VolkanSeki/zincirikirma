@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { applyToggle, weekProgress } from '../lib/dayState.ts'
 import { formatMonthTitle } from '../lib/dates.ts'
 import { habitTypeLabel } from '../lib/habits.ts'
-import { updateDynamicAppleTouchIcon, resetAppleTouchIcon } from '../lib/appleTouchIcon.ts'
 import { setBadgeCount } from '../lib/badge.ts'
 import { calculateStreak } from '../lib/streak.ts'
 import { cx } from '../lib/cx.ts'
@@ -55,20 +54,13 @@ function HabitView({
   const progress = habit.type === 'weekly' ? weekProgress(habit, today) : null
 
   useEffect(() => {
-    updateDynamicAppleTouchIcon(habit.title, streak)
     setBadgeCount(streak)
-  }, [habit.title, streak])
+  }, [streak])
 
   const handleToggle = (dateKey: string) => {
     setBadgeCount(calculateStreak(applyToggle(habit, dateKey, today), today))
     onToggle(dateKey)
   }
-
-  useEffect(() => {
-    return () => {
-      resetAppleTouchIcon()
-    }
-  }, [])
 
   const isCurrent = cursor.year === today.getFullYear() && cursor.month === today.getMonth()
 

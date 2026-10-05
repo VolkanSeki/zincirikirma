@@ -4,6 +4,7 @@ import { applyToggle, weekProgress } from '../lib/dayState.ts'
 import { formatMonthTitle } from '../lib/dates.ts'
 import { habitTypeLabel } from '../lib/habits.ts'
 import { setBadgeCount } from '../lib/badge.ts'
+import { boundSeries } from '../lib/homeScreen.ts'
 import { calculateStreak } from '../lib/streak.ts'
 import { cx } from '../lib/cx.ts'
 import { useHabits } from '../context/useHabits.ts'
@@ -50,15 +51,15 @@ function HabitView({
   const today = useToday()
   const [cursor, setCursor] = useState(() => ({ year: today.getFullYear(), month: today.getMonth() }))
   const [confirming, setConfirming] = useState(false)
+  const { habits } = useHabits()
   const streak = calculateStreak(habit, today)
   const progress = habit.type === 'weekly' ? weekProgress(habit, today) : null
-
-  useEffect(() => {
-    setBadgeCount(streak)
-  }, [streak])
+  const bound = boundSeries()
 
   const handleToggle = (dateKey: string) => {
-    setBadgeCount(calculateStreak(applyToggle(habit, dateKey, today), today))
+    const owner = bound ?? habit.slug
+    const source = owner === habit.slug ? applyToggle(habit, dateKey, today) : habits.find((item) => item.slug === owner)
+    setBadgeCount(source ? calculateStreak(source, today) : 0)
     onToggle(dateKey)
   }
 

@@ -12,7 +12,7 @@ export function BadgeNotice({ count }: { count: number }) {
   if (support === 'install') {
     return (
       <p className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs leading-relaxed text-zinc-400">
-        Rozet, Safari sekmesinde görünmez. İkonu ana ekrandan sil, siteyi yeniden ekle ve Web Uygulaması olarak aç.
+        Rozet, Safari sekmesinde görünmez. Bu sayfadayken Paylaş → Ana Ekrana Ekle. İkon yalnızca bu seriyi açar.
       </p>
     )
   }

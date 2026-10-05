@@ -3,12 +3,14 @@ import { HabitsProvider } from './context/HabitsProvider.tsx'
 import { Dashboard } from './components/Dashboard.tsx'
 import { HabitDetail } from './components/HabitDetail.tsx'
 import { NotFound } from './components/NotFound.tsx'
+import { SeriesHome } from './components/SeriesHome.tsx'
 
 export default function App() {
   return (
     <HabitsProvider>
       <HashRouter>
         <div className="mx-auto min-h-dvh w-full max-w-[430px]">
+          <SeriesHome />
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/:slug" element={<HabitDetail />} />

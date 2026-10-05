@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react'
-import { BadgeNotice } from './BadgeNotice.tsx'
+import { useState } from 'react'
 import { ChainMark } from './ChainMark.tsx'
 import { HabitCard } from './HabitCard.tsx'
 import { NewHabitModal } from './NewHabitModal.tsx'
 import { Page } from './Page.tsx'
-import { setBadgeCount } from '../lib/badge.ts'
-import { calculateStreak } from '../lib/streak.ts'
+import { isIosDevice, isStandaloneApp } from '../lib/homeScreen.ts'
 import { useHabits } from '../context/useHabits.ts'
 import { usePageTitle } from '../hooks/usePageTitle.ts'
 import { useToday } from '../hooks/useToday.ts'
@@ -16,12 +14,6 @@ export function Dashboard() {
   const [open, setOpen] = useState(false)
   usePageTitle('Zinciri Kırma')
 
-  const highest = habits.reduce((max, habit) => Math.max(max, calculateStreak(habit, today)), 0)
-
-  useEffect(() => {
-    setBadgeCount(highest)
-  }, [highest])
-
   const ordered = [...habits].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 
   return (
@@ -30,7 +22,11 @@ export function Dashboard() {
         <p className="text-[11px] font-medium tracking-[0.28em] text-amber-400/80 uppercase">Don't break the chain</p>
         <h1 className="mt-2 font-serif text-[2.9rem] leading-[0.92] font-normal text-zinc-50 italic">Zinciri Kırma</h1>
         <p className="mt-3 max-w-[18rem] text-sm leading-relaxed text-zinc-400">Her tamamlanan gün bir halka daha.</p>
-        <BadgeNotice count={highest} />
+        {isIosDevice() && !isStandaloneApp() && ordered.length > 0 && (
+          <p className="mt-4 max-w-[18rem] text-xs leading-relaxed text-zinc-500">
+            Her seri kendi ikonudur. Seriyi aç, Paylaş, Ana Ekrana Ekle. Rozet yalnızca o seriyi sayar.
+          </p>
+        )}
       </header>
 
       {persistError && (

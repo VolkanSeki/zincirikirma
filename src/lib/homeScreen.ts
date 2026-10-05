@@ -1,7 +1,12 @@
 const APP_TITLE = 'Zinciri Kırma'
 const SERIES_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
+const launchBasePath = detectBase(typeof window === 'undefined' ? 'http://localhost/' : window.location.href)
 const launchSeriesSlug = readLaunchSeries()
+
+export function appBasePath(): string {
+  return launchBasePath
+}
 
 export function readSeries(href: string): string | null {
   try {
@@ -12,19 +17,40 @@ export function readSeries(href: string): string | null {
   }
 }
 
-export function seriesFromHref(href: string): string | null {
+export function seriesFromHref(href: string, root = ''): string | null {
   const fromQuery = readSeries(href)
   if (fromQuery) return fromQuery
   try {
-    const hashPath = new URL(href).hash.replace(/^#/, '').split('?')[0] ?? ''
-    return slugFromPath(hashPath.startsWith('/') ? hashPath : `/${hashPath}`)
+    const url = new URL(href)
+    const hashPath = url.hash.replace(/^#/, '').split('?')[0] ?? ''
+    if (hashPath.startsWith('/')) {
+      const fromHash = slugFromPath(hashPath)
+      if (fromHash) return fromHash
+    }
+    return slugFromPath(stripBase(url.pathname, root))
+  } catch {
+    return null
+  }
+}
+
+export function seriesLaunchPath(href: string, root = ''): string | null {
+  try {
+    const url = new URL(href)
+    const slug = seriesFromHref(href, root)
+    if (!slug) return null
+    const onPath = slugFromPath(stripBase(url.pathname, root)) === slug
+    const dirty = url.searchParams.has('series') || /^#\//.test(url.hash)
+    if (onPath && !dirty) return null
+    const base = root.endsWith('/') ? root.slice(0, -1) : root
+    return `${base}/${slug}`
   } catch {
     return null
   }
 }
 
 export function slugFromPath(pathname: string): string | null {
-  const slug = decodeURIComponent(pathname.replace(/^\/+/, ''))
+  const slug = decodeURIComponent(pathname.replace(/^\/+/, '').replace(/\/+$/, ''))
+  if (slug === '' || slug === 'index.html') return null
   return validSeries(slug)
 }
 
@@ -53,30 +79,36 @@ export function isStandaloneApp(): boolean {
 export function pinSeries(slug: string, title: string): void {
   if (!SERIES_SLUG.test(slug)) return
   if (boundSeries() && boundSeries() !== slug) return
-
-  const url = new URL(window.location.href)
-  if (url.searchParams.get('series') !== slug) {
-    url.searchParams.set('series', slug)
-    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
-  }
   setHomeScreenTitle(title.trim() || APP_TITLE)
-  setManifestLink(slug, title)
 }
 
 export function unpinSeries(): void {
   if (boundSeries()) return
-  const url = new URL(window.location.href)
-  if (url.searchParams.has('series')) {
-    url.searchParams.delete('series')
-    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
-  }
   setHomeScreenTitle(APP_TITLE)
-  setManifestLink(null, null)
+}
+
+function detectBase(href: string): string {
+  try {
+    const url = new URL(href)
+    if (!url.hostname.endsWith('github.io')) return ''
+    const repo = url.pathname.split('/').filter(Boolean)[0]
+    return repo ? `/${repo}` : ''
+  } catch {
+    return ''
+  }
 }
 
 function readLaunchSeries(): string | null {
   if (typeof window === 'undefined') return null
-  return seriesFromHref(window.location.href)
+  return seriesFromHref(window.location.href, launchBasePath)
+}
+
+function stripBase(pathname: string, root: string): string {
+  const base = root.endsWith('/') ? root.slice(0, -1) : root
+  if (!base) return pathname
+  if (pathname === base) return '/'
+  if (pathname.startsWith(`${base}/`)) return pathname.slice(base.length) || '/'
+  return pathname
 }
 
 function validSeries(series: string): string | null {
@@ -91,15 +123,4 @@ function setHomeScreenTitle(title: string): void {
     document.head.appendChild(meta)
   }
   meta.setAttribute('content', title)
-}
-
-function setManifestLink(slug: string | null, title: string | null): void {
-  const link = document.querySelector<HTMLLinkElement>('link[rel="manifest"]')
-  if (!link) return
-  const href = new URL('manifest.json', document.baseURI)
-  if (slug && title) {
-    href.searchParams.set('series', slug)
-    href.searchParams.set('title', title)
-  }
-  link.href = href.href
 }

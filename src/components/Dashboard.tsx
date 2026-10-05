@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { BadgeNotice } from './BadgeNotice.tsx'
 import { ChainMark } from './ChainMark.tsx'
 import { HabitCard } from './HabitCard.tsx'
 import { NewHabitModal } from './NewHabitModal.tsx'
@@ -20,10 +21,11 @@ export function Dashboard() {
     resetAppleTouchIcon()
   }, [])
 
+  const highest = habits.reduce((max, habit) => Math.max(max, calculateStreak(habit, today)), 0)
+
   useEffect(() => {
-    const highest = habits.reduce((max, habit) => Math.max(max, calculateStreak(habit, today)), 0)
     setBadgeCount(highest)
-  }, [habits, today])
+  }, [highest])
 
   const ordered = [...habits].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 
@@ -33,6 +35,7 @@ export function Dashboard() {
         <p className="text-[11px] font-medium tracking-[0.28em] text-amber-400/80 uppercase">Don't break the chain</p>
         <h1 className="mt-2 font-serif text-[2.9rem] leading-[0.92] font-normal text-zinc-50 italic">Zinciri Kırma</h1>
         <p className="mt-3 max-w-[18rem] text-sm leading-relaxed text-zinc-400">Her tamamlanan gün bir halka daha.</p>
+        <BadgeNotice count={highest} />
       </header>
 
       {persistError && (

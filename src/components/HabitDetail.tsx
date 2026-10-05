@@ -10,6 +10,7 @@ import { cx } from '../lib/cx.ts'
 import { useHabits } from '../context/useHabits.ts'
 import { usePageTitle } from '../hooks/usePageTitle.ts'
 import { useToday } from '../hooks/useToday.ts'
+import { BadgeNotice } from './BadgeNotice.tsx'
 import { Calendar } from './Calendar.tsx'
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon } from './Icons.tsx'
 import { Page } from './Page.tsx'
@@ -107,6 +108,7 @@ function HabitView({
         <p className="mt-2 text-[11px] tracking-[0.32em] text-zinc-500 uppercase">gün seri</p>
         <div className="mx-auto mt-4 h-px w-28 bg-gradient-to-r from-transparent via-amber-400/90 to-transparent" />
         <p className="mt-4 text-sm text-zinc-300">{habitTypeLabel(habit)}</p>
+        <BadgeNotice count={streak} />
         {progress && (
           <>
             <p className={cx('mt-1 text-sm', progress.sealed ? 'text-amber-200' : 'text-zinc-400')}>

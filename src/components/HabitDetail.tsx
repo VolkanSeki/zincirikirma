@@ -1,16 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { applyToggle, weekProgress } from '../lib/dayState.ts'
+import { weekProgress } from '../lib/dayState.ts'
 import { formatMonthTitle } from '../lib/dates.ts'
 import { habitTypeLabel } from '../lib/habits.ts'
-import { setBadgeCount } from '../lib/badge.ts'
-import { boundSeries } from '../lib/homeScreen.ts'
 import { calculateStreak } from '../lib/streak.ts'
 import { cx } from '../lib/cx.ts'
 import { useHabits } from '../context/useHabits.ts'
 import { usePageTitle } from '../hooks/usePageTitle.ts'
 import { useToday } from '../hooks/useToday.ts'
-import { BadgeNotice } from './BadgeNotice.tsx'
 import { Calendar } from './Calendar.tsx'
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon } from './Icons.tsx'
 import { Page } from './Page.tsx'
@@ -51,17 +48,8 @@ function HabitView({
   const today = useToday()
   const [cursor, setCursor] = useState(() => ({ year: today.getFullYear(), month: today.getMonth() }))
   const [confirming, setConfirming] = useState(false)
-  const { habits } = useHabits()
   const streak = calculateStreak(habit, today)
   const progress = habit.type === 'weekly' ? weekProgress(habit, today) : null
-  const bound = boundSeries()
-
-  const handleToggle = (dateKey: string) => {
-    const owner = bound ?? habit.slug
-    const source = owner === habit.slug ? applyToggle(habit, dateKey, today) : habits.find((item) => item.slug === owner)
-    setBadgeCount(source ? calculateStreak(source, today) : 0)
-    onToggle(dateKey)
-  }
 
   const isCurrent = cursor.year === today.getFullYear() && cursor.month === today.getMonth()
 
@@ -101,7 +89,6 @@ function HabitView({
         <p className="mt-2 text-[11px] tracking-[0.32em] text-zinc-500 uppercase">gün seri</p>
         <div className="mx-auto mt-4 h-px w-28 bg-gradient-to-r from-transparent via-amber-400/90 to-transparent" />
         <p className="mt-4 text-sm text-zinc-300">{habitTypeLabel(habit)}</p>
-        <BadgeNotice count={streak} />
         {progress && (
           <>
             <p className={cx('mt-1 text-sm', progress.sealed ? 'text-amber-200' : 'text-zinc-400')}>
@@ -139,7 +126,7 @@ function HabitView({
       </div>
 
       <div className="mt-4">
-        <Calendar habit={habit} today={today} year={cursor.year} month={cursor.month} onToggle={handleToggle} />
+        <Calendar habit={habit} today={today} year={cursor.year} month={cursor.month} onToggle={onToggle} />
       </div>
 
       <Legend habit={habit} />
@@ -212,10 +199,6 @@ function Legend({ habit }: { habit: Habit }) {
 }
 
 function MissingHabit() {
-  useEffect(() => {
-    setBadgeCount(0)
-  }, [])
-
   return (
     <Page>
       <Link

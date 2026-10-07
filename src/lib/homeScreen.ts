@@ -1,8 +1,6 @@
-const APP_TITLE = 'Zinciri Kırma'
 const SERIES_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 const launchBasePath = detectBase(typeof window === 'undefined' ? 'http://localhost/' : window.location.href)
-const launchSeriesSlug = readLaunchSeries()
 
 export function appBasePath(): string {
   return launchBasePath
@@ -54,39 +52,6 @@ export function slugFromPath(pathname: string): string | null {
   return validSeries(slug)
 }
 
-export function boundSeries(): string | null {
-  return isStandaloneApp() ? launchSeriesSlug : null
-}
-
-export function isIosDevice(): boolean {
-  if (typeof navigator === 'undefined') return false
-  const ua = navigator.userAgent
-  if (/iPhone|iPad|iPod/.test(ua)) return true
-  return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1
-}
-
-export function isStandaloneApp(): boolean {
-  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
-  const standalone = (navigator as Navigator & { standalone?: boolean }).standalone
-  if (standalone === true) return true
-  if (typeof window.matchMedia !== 'function') return false
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.matchMedia('(display-mode: fullscreen)').matches
-  )
-}
-
-export function pinSeries(slug: string, title: string): void {
-  if (!SERIES_SLUG.test(slug)) return
-  if (boundSeries() && boundSeries() !== slug) return
-  setHomeScreenTitle(title.trim() || APP_TITLE)
-}
-
-export function unpinSeries(): void {
-  if (boundSeries()) return
-  setHomeScreenTitle(APP_TITLE)
-}
-
 function detectBase(href: string): string {
   try {
     const url = new URL(href)
@@ -96,11 +61,6 @@ function detectBase(href: string): string {
   } catch {
     return ''
   }
-}
-
-function readLaunchSeries(): string | null {
-  if (typeof window === 'undefined') return null
-  return seriesFromHref(window.location.href, launchBasePath)
 }
 
 function stripBase(pathname: string, root: string): string {
@@ -113,14 +73,4 @@ function stripBase(pathname: string, root: string): string {
 
 function validSeries(series: string): string | null {
   return SERIES_SLUG.test(series) ? series : null
-}
-
-function setHomeScreenTitle(title: string): void {
-  let meta = document.querySelector('meta[name="apple-mobile-web-app-title"]')
-  if (!meta) {
-    meta = document.createElement('meta')
-    meta.setAttribute('name', 'apple-mobile-web-app-title')
-    document.head.appendChild(meta)
-  }
-  meta.setAttribute('content', title)
 }
